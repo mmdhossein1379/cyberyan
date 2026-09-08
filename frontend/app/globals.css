@@ -1,0 +1,74 @@
+:root {
+  --bg: #f5f7fb;
+  --surface: #ffffff;
+  --surface-muted: #eef2f7;
+  --text: #172033;
+  --muted: #667085;
+  --border: #dce3ec;
+  --accent: #0a66c2;
+  --accent-dark: #084f95;
+  --danger-bg: #fff1f1;
+  --danger: #a52424;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+button, input, select { font: inherit; }
+
+.shell { max-width: 1180px; margin: 0 auto; padding: 56px 24px 72px; }
+.hero { display: flex; justify-content: space-between; gap: 24px; align-items: flex-end; margin-bottom: 28px; }
+.hero h1 { margin: 4px 0 8px; font-size: clamp(32px, 5vw, 52px); letter-spacing: -0.04em; }
+.hero p { margin: 0; color: var(--muted); }
+.eyebrow { text-transform: uppercase; letter-spacing: .14em; font-weight: 700; font-size: 12px; color: var(--accent) !important; }
+.stat { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 16px 20px; min-width: 160px; }
+.stat strong { display: block; font-size: 28px; }
+.stat span { color: var(--muted); font-size: 13px; }
+
+.searchPanel { display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 14px; align-items: end; background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 18px; box-shadow: 0 14px 40px rgba(23, 32, 51, .05); }
+.field { display: flex; flex-direction: column; gap: 7px; min-width: 0; }
+.field span { font-size: 13px; font-weight: 650; }
+input, select { width: 100%; height: 44px; border: 1px solid var(--border); border-radius: 10px; padding: 0 12px; background: #fff; color: var(--text); outline: none; }
+input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(10, 102, 194, .12); }
+.actions { display: flex; gap: 8px; }
+button { height: 44px; border: 0; border-radius: 10px; padding: 0 18px; background: var(--accent); color: white; font-weight: 700; cursor: pointer; }
+button:hover:not(:disabled) { background: var(--accent-dark); }
+button:disabled { opacity: .5; cursor: not-allowed; }
+button.secondary { background: var(--surface-muted); color: var(--text); }
+
+.resultHeader { display: flex; justify-content: space-between; align-items: center; margin: 34px 0 14px; }
+.resultHeader h2 { margin: 0 0 4px; font-size: 20px; }
+.resultHeader p { margin: 0; color: var(--muted); font-size: 14px; }
+.grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; min-height: 280px; display: flex; flex-direction: column; }
+.cardHeader { display: flex; gap: 12px; align-items: flex-start; justify-content: space-between; }
+.card h2 { margin: 0; font-size: 20px; text-transform: capitalize; }
+.role { margin: 6px 0 0; color: var(--muted); font-size: 14px; line-height: 1.4; }
+.linkedinLink { white-space: nowrap; color: var(--accent); text-decoration: none; font-size: 13px; font-weight: 700; }
+.metaRow { display: flex; flex-wrap: wrap; gap: 6px 12px; margin: 18px 0 0; color: var(--muted); font-size: 12px; text-transform: capitalize; }
+.summary { color: #475467; font-size: 13px; line-height: 1.55; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+.education { font-size: 12px; color: #475467; margin-top: auto; }
+.skills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+.skills span { background: #edf5fd; color: #245b8f; border-radius: 999px; padding: 5px 8px; font-size: 11px; }
+.error, .empty { margin-top: 22px; border-radius: 12px; padding: 16px; }
+.error { background: var(--danger-bg); color: var(--danger); }
+.empty { background: var(--surface); border: 1px dashed var(--border); color: var(--muted); }
+.pagination { display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 30px; color: var(--muted); font-size: 14px; }
+
+@media (max-width: 900px) {
+  .searchPanel { grid-template-columns: 1fr 1fr; }
+  .fieldWide { grid-column: 1 / -1; }
+  .actions { grid-column: 1 / -1; }
+  .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 620px) {
+  .shell { padding: 30px 16px 48px; }
+  .hero { align-items: flex-start; flex-direction: column; }
+  .searchPanel, .grid { grid-template-columns: 1fr; }
+  .fieldWide, .actions { grid-column: auto; }
+  .actions button { flex: 1; }
+}
