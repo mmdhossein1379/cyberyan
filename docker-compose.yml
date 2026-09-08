@@ -1,0 +1,157 @@
+services:
+  db:
+    image: postgres:16-alpine
+
+    container_name: linkedin_db
+
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+    ports:
+      - "127.0.0.1:${POSTGRES_HOST_PORT}:${POSTGRES_PORT}"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB} -p ${POSTGRES_PORT}"
+        ]
+
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 5s
+
+    networks:
+      - db_net
+
+
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.15.3
+    container_name: linkedin_elasticsearch
+    restart: unless-stopped
+
+    environment:
+      discovery.type: single-node
+      xpack.security.enabled: "false"
+      xpack.security.enrollment.enabled: "false"
+      ES_JAVA_OPTS: ${ES_JAVA_OPTS}
+
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -fsS http://localhost:${ELASTICSEARCH_PORT}/_cluster/health || exit 1"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
+
+    networks:
+      - search_net
+
+
+  backend:
+    build:
+      context: ./backend
+
+    container_name: linkedin_backend
+
+    restart: unless-stopped
+
+    environment:
+
+      PORT: ${BACKEND_PORT}
+
+      DATABASE_URL: >-
+        postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:${POSTGRES_PORT}/${POSTGRES_DB}
+
+      ELASTICSEARCH_URL: >-
+        http://elasticsearch:${ELASTICSEARCH_PORT}
+
+      ELASTICSEARCH_INDEX: ${ELASTICSEARCH_INDEX}
+
+      CORS_ORIGINS: ${CORS_ORIGINS}
+
+      DATASET_PATH: ${DATASET_PATH}
+
+    volumes:
+      - ./data:/app/data:ro
+
+    ports:
+      - "127.0.0.1:${BACKEND_HOST_PORT}:${BACKEND_PORT}"
+
+    depends_on:
+
+      db:
+        condition: service_healthy
+
+      elasticsearch:
+        condition: service_healthy
+
+    networks:
+      - frontend_backend_net
+      - db_net
+      - search_net
+
+
+  frontend:
+    build:
+
+      context: ./frontend
+
+      args:
+
+        BACKEND_URL: >-
+          http://backend:${BACKEND_PORT}
+
+    container_name: linkedin_frontend
+
+    restart: unless-stopped
+
+    environment:
+      PORT: ${FRONTEND_PORT}
+
+    ports:
+      - "${FRONTEND_HOST_PORT}:${FRONTEND_PORT}"
+
+    depends_on:
+      - backend
+
+    networks:
+      - frontend_backend_net
+
+
+
+volumes:
+  postgres_data:
+    name: linkedin_postgres_data
+
+  elasticsearch_data:
+    name: linkedin_elasticsearch_data
+
+
+networks:
+
+  frontend_backend_net:
+    driver: bridge
+
+  db_net:
+    driver: bridge
+    internal: true
+
+  search_net:
+    driver: bridge
+    internal: true
