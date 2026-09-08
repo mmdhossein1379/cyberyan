@@ -241,9 +241,14 @@ docker compose version
 Go to project root:
 
 ```bash
-cd linkedin-profile-search
+cd cyberyan
 ```
 
+Before running the project, create your environment file:
+
+```bash
+cp .env.example .env
+```
 Start all services:
 
 ```bash
